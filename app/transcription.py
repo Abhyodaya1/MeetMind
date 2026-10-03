@@ -12,7 +12,12 @@ whisper_pipeline = pipeline(
 )
 
 def transcribe_audio(audio_file):
-  pipe = whisper_pipeline
+  pipe = whisper_pipeline(
+    str(audio_file),
+    chunk_length_s=30,
+    stride_length_s=5,
+  )
   result = pipe(str(audio_file))
+
 
   return result["text"]

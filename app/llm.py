@@ -7,10 +7,12 @@ load_dotenv()  # Load environment variables from .env file
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def generate_minutes(prompt):
+MODEL = "openai/gpt-oss-120b"  # Specify the model you want to use
+
+def call_llm(prompt):
 
     response = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
+        model=MODEL,
          messages=[
             {
                 "role": "system",
@@ -28,6 +30,13 @@ def generate_minutes(prompt):
 
     content =  response.choices[0].message.content
 
-    return json.loads(content)  # Parse the JSON string into a Python dictionary
+    return json.loads(content) 
+
+def analyze_chunk(prompt):
+    return call_llm(prompt) 
+
+def synthesize_meeting(prompt):
+    return call_llm(prompt)
+
 
 
