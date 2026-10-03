@@ -4,7 +4,7 @@ from app.meeting import process_meeting
 
 
 
-audio_file = Path(__file__).parent / "data" / "audio" / "meeting_003.wav"
+audio_file = Path(__file__).parent / "data" / "audio" / "ES2002a.Mix-Headset.wav"
 
 minutes = process_meeting(audio_file)
 
