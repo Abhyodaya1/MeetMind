@@ -21,4 +21,4 @@ def transcribe_audio(audio_file):
         return_timestamps=True,
     )
 
-    return result["text"]
+    return result

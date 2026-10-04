@@ -1,6 +1,16 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 
+class TranscriptSegment(BaseModel):
+    text: str
+    start: float
+    end: Optional[float] = None
+
+class TranscriptChunk(BaseModel):
+    text: str
+    start: float
+    end: Optional[float] = None
+
 
 class ActionItem(BaseModel):
     task: str
