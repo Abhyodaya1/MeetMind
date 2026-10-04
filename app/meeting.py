@@ -1,6 +1,7 @@
 from app.transcription import transcribe_audio
 from app.transcript import normalize_transcript
 from app.chunking import chunk_transcript
+from app.validation import validate_action_evidence
 
 from app.prompting import (
     create_chunk_prompt,
@@ -105,10 +106,9 @@ def process_meeting(audio_file):
     )
 
     if failed_chunks:
-
-        print(
-            f"Failed chunks: {failed_chunks}"
-        )
+      raise RuntimeError(
+        f"Chunk analysis failed for chunks: {failed_chunks}"
+    )
 
     print(
         "\nSynthesizing final meeting analysis..."
@@ -130,5 +130,22 @@ def process_meeting(audio_file):
     minutes = MeetingMinutes.model_validate(
         raw_minutes
     )
+
+    print("\nValidating evidence...")
+
+    for index, action in enumerate(
+        minutes.action_items,
+        start=1,
+    ):
+
+        valid = validate_action_evidence(
+            action,
+            chunks,
+        )
+
+        print(
+            f"Action {index} evidence: "
+            f"{'VALID' if valid else 'INVALID'}"
+        )
 
     return minutes
