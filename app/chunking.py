@@ -55,6 +55,7 @@ def chunk_transcript(
                 text=chunk_text,
                 start=chunk_start,
                 end=chunk_end,
+                segments=current_segments
             )
         )
 

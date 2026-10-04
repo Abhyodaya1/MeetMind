@@ -10,13 +10,20 @@ class TranscriptChunk(BaseModel):
     text: str
     start: float
     end: Optional[float] = None
+    segments: list[TranscriptSegment] = Field(
+        default_factory=list
+    )
 
+class Evidence(BaseModel):
+    text: str
+    start: float
+    end: Optional[float] = None
 
 class ActionItem(BaseModel):
     task: str
     owner: Optional[str] = None
     deadline: Optional[str] = None
-    evidence: Optional[str] = None
+    evidence: Optional[Evidence] = None
 
 class ChunkAnalysis(BaseModel):
     key_points: list[str] = Field(default_factory=list)

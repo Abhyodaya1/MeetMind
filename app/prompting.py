@@ -1,4 +1,14 @@
 def create_chunk_prompt(chunk, chunk_number, total_chunks):
+
+    timestamped_transcript = "\n".join(
+        (
+            f"[{segment.start:.2f}s → "
+            f"{segment.end if segment.end is not None else 'unknown'}s]\n"
+            f"{segment.text}"
+        )
+        for segment in chunk.segments
+    )
+
     return f"""
 You are MeetMind, an AI meeting intelligence system.
 
@@ -23,7 +33,11 @@ Return EXACTLY this JSON structure:
             "task": "",
             "owner": null,
             "deadline": null,
-            "evidence": ""
+            "evidence": {{
+                "text": "",
+                "start": 0.0,
+                "end": null
+            }}
         }}
     ]
 }}
@@ -35,17 +49,33 @@ Rules:
 3. Only include action items explicitly stated or assigned.
 4. Owner must be null if not explicitly identified.
 5. Deadline must be null if not explicitly identified.
-6. Evidence must be directly supported by this transcript section.
+6. Evidence must be directly supported by the transcript.
 7. If there are no items, return empty arrays.
 8. Keep key points concise.
 9. Return ONLY valid JSON.
 
+Evidence rules:
+
+10. Evidence.text must come directly from the transcript.
+11. Evidence.start must match the start timestamp of the
+    transcript segment containing the evidence.
+12. Evidence.end must match the end timestamp of the
+    transcript segment containing the evidence.
+13. Never invent timestamps.
+14. If evidence spans multiple adjacent transcript segments,
+    use the earliest start and latest end.
+15. If there is no supporting evidence, set evidence to null.
+
+The transcript below contains timestamped segments.
+Use these timestamps as the source of truth.
+
 Transcript section:
 ----------------
-{chunk.text}
+
+{timestamped_transcript}
+
 ----------------
 """
-
 
 def create_synthesis_prompt(chunk_analyses):
     return f"""
@@ -68,7 +98,11 @@ Return EXACTLY this JSON structure:
             "task": "string",
             "owner": null,
             "deadline": null,
-            "evidence": ""
+            "evidence": {{
+                "text": "",
+                "start": 0.0,
+                "end": null
+            }}
         }}
     ]
 }}
@@ -88,9 +122,16 @@ Rules:
 11. If there are no decisions, return [].
 12. If there are no action items, return [].
 13. Return ONLY valid JSON.
+14. Preserve evidence text and timestamps from the chunk analyses.
+15. Never invent or modify evidence timestamps.
+16. When merging duplicate action items, preserve the evidence
+    that most directly supports the final action item.
+17. Evidence may be null if no supporting evidence exists.
 
 Chunk analyses:
 ----------------
+
 {chunk_analyses}
+
 ----------------
 """
