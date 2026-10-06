@@ -1,6 +1,6 @@
 from app.transcript import normalize_transcript
 from app.chunking import chunk_transcript
-from app.validation import validate_action_evidence
+from app.validation import validate_action_evidence, validate_decision_evidence, validate_evidence
 from app.providers.whisper import WhisperProvider
 from app.providers.groq import GroqProvider
 from app.providers.hf_tokenizer import HFTokenizerProvider
@@ -89,7 +89,6 @@ def process_meeting(audio_file):
         )
 
         try:
-
             raw_analysis = llm.analyze(prompt)
 
             analysis = ChunkAnalysis.model_validate(
@@ -159,5 +158,34 @@ def process_meeting(audio_file):
             f"Action {index} evidence: "
             f"{'VALID' if valid else 'INVALID'}"
         )
+
+        valid, reason = validate_evidence(
+            action.evidence,
+            chunks,
+        )
+
+        print(
+            f"Action {i} evidence: "
+            f"{'VALID' if valid else 'INVALID'} "
+            f"({reason})"
+        )
+
+        
+
+    for i, decision in enumerate(
+    minutes.decisions,
+    start=1,
+):
+       valid = validate_decision_evidence(
+        decision,
+        chunks,
+    )
+
+       print(
+        f"Decision {i} evidence: "
+        f"{'VALID' if valid else 'INVALID'}"
+    )
+
+    
 
     return minutes
