@@ -165,7 +165,7 @@ def process_meeting(audio_file):
         )
 
         print(
-            f"Action {i} evidence: "
+            f"Action {index} evidence: "
             f"{'VALID' if valid else 'INVALID'} "
             f"({reason})"
         )

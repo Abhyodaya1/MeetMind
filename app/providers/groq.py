@@ -4,7 +4,6 @@ import time
 
 from dotenv import load_dotenv
 from groq import Groq
-
 from app.providers.llm import LLMProvider
 
 
@@ -100,3 +99,8 @@ class GroqProvider(LLMProvider):
 
     def synthesize(self, prompt):
         return self._call(prompt)
+
+    def judge(self, prompt):
+        return self._call(prompt)
+
+   

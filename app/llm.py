@@ -16,7 +16,6 @@ MODEL = "openai/gpt-oss-120b"
 
 MAX_RETRIES = 3
 
-
 def call_llm(prompt):
     """
     Send a prompt to Groq and return parsed JSON.

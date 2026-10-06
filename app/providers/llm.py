@@ -10,3 +10,7 @@ class LLMProvider(ABC):
     @abstractmethod
     def synthesize(self, prompt):
         pass
+
+    @abstractmethod
+    def judge(self, prompt):
+        pass

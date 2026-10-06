@@ -20,6 +20,33 @@ class Evidence(BaseModel):
     start: float
     end: Optional[float] = None
 
+class MetricResult(BaseModel):
+    precision: float
+    recall: float
+    f1: float
+
+
+class EvaluationReport(BaseModel):
+    action_items: MetricResult
+    decisions: MetricResult
+    evidence_validity: float
+
+class GroundTruthItem(BaseModel):
+    text: str
+
+class JudgeResult(BaseModel):
+    match: bool
+    score: float
+    reason: str
+
+class GroundTruthMeeting(BaseModel):
+    action_items: list[GroundTruthItem] = Field(
+        default_factory=list
+    )
+    decisions: list[GroundTruthItem] = Field(
+        default_factory=list
+    )
+
 class ActionItem(BaseModel):
     task: str
     owner: Optional[str] = None
