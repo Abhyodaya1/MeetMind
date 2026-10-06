@@ -1,16 +1,12 @@
-from app.transcription import transcribe_audio
 from app.transcript import normalize_transcript
 from app.chunking import chunk_transcript
 from app.validation import validate_action_evidence
+from app.providers.whisper import WhisperProvider
+from app.providers.groq import GroqProvider
 
 from app.prompting import (
     create_chunk_prompt,
     create_synthesis_prompt,
-)
-
-from app.llm import (
-    analyze_chunk,
-    synthesize_meeting,
 )
 
 from app.schemas import (
@@ -21,9 +17,12 @@ from app.schemas import (
 
 def process_meeting(audio_file):
 
+    asr = WhisperProvider()
+    llm = GroqProvider()
+
     print("Transcribing meeting...")
 
-    transcript_result = transcribe_audio(audio_file)
+    transcript_result = asr.transcribe(audio_file)
 
     print("Normalizing transcript...")
     segments = normalize_transcript(
@@ -78,7 +77,7 @@ def process_meeting(audio_file):
 
         try:
 
-            raw_analysis = analyze_chunk(prompt)
+            raw_analysis = llm.analyze(prompt)
 
             analysis = ChunkAnalysis.model_validate(
                 raw_analysis
@@ -123,7 +122,7 @@ def process_meeting(audio_file):
         synthesis_input
     )
 
-    raw_minutes = synthesize_meeting(
+    raw_minutes = llm.synthesize(
         synthesis_prompt
     )
 
