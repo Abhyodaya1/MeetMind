@@ -3,7 +3,8 @@ from app.schemas import TranscriptSegment, TranscriptChunk
 
 def chunk_transcript(
     segments: list[TranscriptSegment],
-    max_chars: int = 12000,
+    tokenizer,
+    max_tokens: int = 8000,
     overlap_segments: int = 2,
 ) -> list[TranscriptChunk]:
 
@@ -18,7 +19,6 @@ def chunk_transcript(
     while start_index < total_segments:
 
         current_segments = []
-        current_length = 0
 
         index = start_index
 
@@ -26,16 +26,26 @@ def chunk_transcript(
 
             segment = segments[index]
 
-            segment_length = len(segment.text)
+            candidate_segments = (
+                current_segments + [segment]
+            )
+
+            candidate_text = " ".join(
+                item.text
+                for item in candidate_segments
+            )
+
+            token_count = tokenizer.count_tokens(
+                candidate_text
+            )
 
             if (
                 current_segments
-                and current_length + segment_length > max_chars
+                and token_count > max_tokens
             ):
                 break
 
             current_segments.append(segment)
-            current_length += segment_length
 
             index += 1
 
@@ -46,7 +56,9 @@ def chunk_transcript(
             segment.text
             for segment in current_segments
         )
-
+        chunk_token_count = tokenizer.count_tokens(
+        chunk_text
+         )
         chunk_start = current_segments[0].start
         chunk_end = current_segments[-1].end
 
@@ -55,7 +67,8 @@ def chunk_transcript(
                 text=chunk_text,
                 start=chunk_start,
                 end=chunk_end,
-                segments=current_segments
+                token_count=chunk_token_count,
+                segments=current_segments,
             )
         )
 

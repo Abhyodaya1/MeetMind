@@ -10,6 +10,7 @@ class TranscriptChunk(BaseModel):
     text: str
     start: float
     end: Optional[float] = None
+    token_count: int = 0
     segments: list[TranscriptSegment] = Field(
         default_factory=list
     )

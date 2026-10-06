@@ -3,6 +3,10 @@ from app.chunking import chunk_transcript
 from app.validation import validate_action_evidence
 from app.providers.whisper import WhisperProvider
 from app.providers.groq import GroqProvider
+from app.providers.hf_tokenizer import HFTokenizerProvider
+from app.config import MAX_TRANSCRIPT_TOKENS
+
+
 
 from app.prompting import (
     create_chunk_prompt,
@@ -19,6 +23,7 @@ def process_meeting(audio_file):
 
     asr = WhisperProvider()
     llm = GroqProvider()
+    tokenizer = HFTokenizerProvider()
 
     print("Transcribing meeting...")
 
@@ -42,8 +47,13 @@ def process_meeting(audio_file):
         "Creating timestamp-aware transcript chunks..."
     )
 
-    chunks = chunk_transcript(segments)
+    chunks = chunk_transcript(
+    segments,
+    tokenizer=tokenizer,
+    max_tokens=MAX_TRANSCRIPT_TOKENS,
+)
 
+    
     if not chunks:
         raise ValueError(
             "Transcript produced no chunks."
@@ -60,7 +70,10 @@ def process_meeting(audio_file):
 
         print(
             f"\nAnalyzing chunk "
-            f"{index}/{len(chunks)}..."
+            f"Chunk {index}: "
+        f"{chunk.token_count} tokens | "
+        f"{chunk.start:.2f}s → "
+        f"{chunk.end if chunk.end is not None else 'unknown'}s"
         )
 
         print(
