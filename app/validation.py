@@ -1,6 +1,7 @@
 from math import isclose
+import re
 
-from app.schemas import ActionItem, TranscriptChunk , Decision
+from app.schemas import ActionItem, Decision, Evidence, TranscriptChunk
 
 
 TIMESTAMP_TOLERANCE = 0.05
@@ -171,3 +172,86 @@ def validate_decision_evidence(
     )
 
     return valid
+
+
+def _normalize_for_repair(text: str) -> str:
+    cleaned = re.sub(r"[^\w\s]", " ", text.lower())
+    return " ".join(cleaned.split())
+
+
+def _token_containment(evidence_tokens: list[str], candidate_tokens: list[str]) -> float:
+    if not evidence_tokens or not candidate_tokens:
+        return 0.0
+    ev_set = set(evidence_tokens)
+    cand_set = set(candidate_tokens)
+    return len(ev_set & cand_set) / len(ev_set)
+
+
+def repair_evidence(
+    evidence: Evidence | None,
+    chunks: list[TranscriptChunk],
+    min_overlap_ratio: float = 0.75,
+    max_window_segments: int = 3,
+) -> tuple[Evidence | None, bool, str]:
+    """
+    Attempt deterministic evidence repair when strict validation fails.
+
+    Preserves validate_evidence() as the strict baseline. Never invents
+    timestamps: only snaps to real TranscriptSegment boundaries in `chunks`.
+    """
+    valid, reason = validate_evidence(evidence, chunks)
+    if valid:
+        return evidence, True, "valid"
+
+    if evidence is None or not evidence.text.strip():
+        return evidence, False, "missing_evidence"
+
+    norm_ev = _normalize_for_repair(evidence.text)
+    ev_tokens = norm_ev.split()
+    if not ev_tokens:
+        return evidence, False, "empty_evidence"
+
+    seen: set[tuple[float, float | None, str]] = set()
+    segments = []
+    for chunk in chunks:
+        for seg in chunk.segments:
+            key = (seg.start, seg.end, seg.text)
+            if key not in seen:
+                seen.add(key)
+                segments.append(seg)
+
+    best_score = 0.0
+    best_span = None
+
+    for start_idx in range(len(segments)):
+        for span_len in range(1, max_window_segments + 1):
+            end_idx = start_idx + span_len
+            if end_idx > len(segments):
+                break
+            window = segments[start_idx:end_idx]
+            window_text = " ".join(s.text for s in window)
+            norm_window = _normalize_for_repair(window_text)
+
+            if norm_ev in norm_window:
+                repaired = Evidence(
+                    text=window_text,
+                    start=window[0].start,
+                    end=window[-1].end,
+                )
+                return repaired, True, "repaired_exact_span"
+
+            score = _token_containment(ev_tokens, norm_window.split())
+            if score > best_score:
+                best_score = score
+                best_span = (window, window_text)
+
+    if best_span is not None and best_score >= min_overlap_ratio:
+        window, window_text = best_span
+        repaired = Evidence(
+            text=window_text,
+            start=window[0].start,
+            end=window[-1].end,
+        )
+        return repaired, True, "repaired_token_overlap"
+
+    return evidence, False, reason

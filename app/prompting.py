@@ -1,11 +1,34 @@
+def format_timestamped_segment(segment) -> str:
+    end_str = (
+        f"{segment.end}" if segment.end is not None else "unknown"
+    )
+    return f"[{segment.start:.2f}s → {end_str}s]\n{segment.text}"
+
+
+def estimate_chunk_prompt_overhead(
+    tokenizer,
+    chunk_number: int = 1,
+    total_chunks: int = 1,
+) -> int:
+    """Measure token overhead of the chunk prompt wrapper without transcript segments."""
+
+    class _EmptyChunk:
+        start = 0.0
+        end = 0.0
+        segments = []
+
+    empty_prompt = create_chunk_prompt(
+        _EmptyChunk(),
+        chunk_number=chunk_number,
+        total_chunks=total_chunks,
+    )
+    return tokenizer.count_tokens(empty_prompt)
+
+
 def create_chunk_prompt(chunk, chunk_number, total_chunks):
 
     timestamped_transcript = "\n".join(
-        (
-            f"[{segment.start:.2f}s → "
-            f"{segment.end if segment.end is not None else 'unknown'}s]\n"
-            f"{segment.text}"
-        )
+        format_timestamped_segment(segment)
         for segment in chunk.segments
     )
 

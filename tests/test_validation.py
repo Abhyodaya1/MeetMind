@@ -1,7 +1,7 @@
 import unittest
 
 from app.schemas import Evidence, TranscriptChunk, TranscriptSegment
-from app.validation import validate_evidence
+from app.validation import repair_evidence, validate_evidence
 
 
 class TestValidation(unittest.TestCase):
@@ -55,6 +55,31 @@ class TestValidation(unittest.TestCase):
         )
         valid, reason = validate_evidence(ev, self.chunks)
         self.assertFalse(valid)
+        self.assertEqual(reason, "evidence_text_not_found")
+
+    def test_repair_evidence_snaps_wrong_timestamps(self):
+        ev = Evidence(
+            text="move authentication to OAuth 2.0",
+            start=99.0,
+            end=105.0,
+        )
+        repaired, ok, reason = repair_evidence(ev, self.chunks)
+        self.assertTrue(ok)
+        self.assertEqual(reason, "repaired_exact_span")
+        self.assertIsNotNone(repaired)
+        self.assertEqual(repaired.start, 10.0)
+        self.assertEqual(repaired.end, 15.0)
+        strict_ok, _ = validate_evidence(repaired, self.chunks)
+        self.assertTrue(strict_ok)
+
+    def test_repair_evidence_rejects_hallucination(self):
+        ev = Evidence(
+            text="completely fabricated decision about budget",
+            start=10.0,
+            end=15.0,
+        )
+        _, ok, reason = repair_evidence(ev, self.chunks)
+        self.assertFalse(ok)
         self.assertEqual(reason, "evidence_text_not_found")
 
 

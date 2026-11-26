@@ -4,13 +4,11 @@ from app.validation import validate_action_evidence, validate_decision_evidence,
 from app.providers.whisper import WhisperProvider
 from app.providers.groq import GroqProvider
 from app.providers.hf_tokenizer import HFTokenizerProvider
-from app.config import MAX_TRANSCRIPT_TOKENS
-
-
-
+from app.config import MAX_CONTEXT_TOKENS, RESERVED_PROMPT_TOKENS
 from app.prompting import (
     create_chunk_prompt,
     create_synthesis_prompt,
+    estimate_chunk_prompt_overhead,
 )
 
 from app.schemas import (
@@ -44,14 +42,21 @@ def process_meeting(audio_file):
     )
 
     print(
-        "Creating timestamp-aware transcript chunks..."
+        "Creating prompt-aware, timestamp-aware transcript chunks..."
+    )
+
+    prompt_overhead = max(
+        RESERVED_PROMPT_TOKENS,
+        estimate_chunk_prompt_overhead(tokenizer),
     )
 
     chunks = chunk_transcript(
-    segments,
-    tokenizer=tokenizer,
-    max_tokens=MAX_TRANSCRIPT_TOKENS,
-)
+        segments,
+        tokenizer=tokenizer,
+        max_tokens=MAX_CONTEXT_TOKENS,
+        prompt_aware=True,
+        prompt_overhead_tokens=prompt_overhead,
+    )
 
     
     if not chunks:
