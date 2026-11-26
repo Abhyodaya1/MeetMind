@@ -1,6 +1,8 @@
 from app.transcript import normalize_transcript
 from app.chunking import chunk_transcript
+from app.diarization import align_speakers
 from app.validation import validate_action_evidence, validate_decision_evidence, validate_evidence
+from app.providers.diarization import DiarizationProvider
 from app.providers.whisper import WhisperProvider
 from app.providers.groq import GroqProvider
 from app.providers.hf_tokenizer import HFTokenizerProvider
@@ -17,7 +19,10 @@ from app.schemas import (
 )
 
 
-def process_meeting(audio_file):
+def process_meeting(
+    audio_file,
+    diarizer: DiarizationProvider | None = None,
+):
 
     asr = WhisperProvider()
     llm = GroqProvider()
@@ -36,6 +41,11 @@ def process_meeting(audio_file):
         raise ValueError(
             "No valid transcript segments were produced."
         )
+
+    if diarizer is not None:
+        print("Running speaker diarization...")
+        turns = diarizer.diarize(audio_file)
+        segments = align_speakers(segments, turns)
 
     print(
         f"Valid transcript segments: {len(segments)}"

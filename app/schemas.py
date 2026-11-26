@@ -1,10 +1,17 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 
+class SpeakerTurn(BaseModel):
+    speaker: str
+    start: float
+    end: float
+
+
 class TranscriptSegment(BaseModel):
     text: str
     start: float
     end: Optional[float] = None
+    speaker: Optional[str] = None
 
 class TranscriptChunk(BaseModel):
     text: str

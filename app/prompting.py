@@ -2,6 +2,8 @@ def format_timestamped_segment(segment) -> str:
     end_str = (
         f"{segment.end}" if segment.end is not None else "unknown"
     )
+    if getattr(segment, "speaker", None):
+        return f"[{segment.speaker} | {segment.start:.2f}s → {end_str}s]\n{segment.text}"
     return f"[{segment.start:.2f}s → {end_str}s]\n{segment.text}"
 
 
