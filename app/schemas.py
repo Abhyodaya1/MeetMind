@@ -76,3 +76,22 @@ class MeetingMinutes(BaseModel):
     key_points: list[str] = Field(default_factory=list)
     decisions: list[Decision] = Field(default_factory=list)
     action_items: list[ActionItem] = Field(default_factory=list)
+
+
+class IndexedChunk(BaseModel):
+    meeting_id: str
+    chunk_index: int
+    text: str
+    start: float
+    end: Optional[float] = None
+    speakers: list[str] = Field(default_factory=list)
+
+
+class RetrievedChunk(BaseModel):
+    chunk: IndexedChunk
+    score: float
+
+
+class GroundedAnswer(BaseModel):
+    answer: str
+    citations: list[RetrievedChunk] = Field(default_factory=list)
