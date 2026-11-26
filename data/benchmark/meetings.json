@@ -1,0 +1,164 @@
+[
+  {
+    "case_id": "ami_remote_design_01",
+    "chunks": [
+      {
+        "text": "David will create the remote control design by Friday. We agreed to use a curved ergonomic casing. Sarah will prepare the project presentation.",
+        "start": 0.0,
+        "end": 18.0,
+        "token_count": 26,
+        "segments": [
+          {
+            "text": "David will create the remote control design by Friday.",
+            "start": 0.0,
+            "end": 6.0
+          },
+          {
+            "text": "We agreed to use a curved ergonomic casing.",
+            "start": 6.0,
+            "end": 12.0
+          },
+          {
+            "text": "Sarah will prepare the project presentation.",
+            "start": 12.0,
+            "end": 18.0
+          }
+        ]
+      }
+    ],
+    "minutes": {
+      "title": "Remote Control Kickoff",
+      "summary": "Assigned remote control design and presentation tasks and selected ergonomic casing.",
+      "key_points": [
+        "Ergonomic casing selected",
+        "Design and presentation tasks assigned"
+      ],
+      "decisions": [
+        {
+          "description": "Use a curved ergonomic casing for the remote control.",
+          "evidence": {
+            "text": "We agreed to use a curved ergonomic casing.",
+            "start": 6.0,
+            "end": 12.0
+          }
+        }
+      ],
+      "action_items": [
+        {
+          "task": "Develop the working design of the remote control.",
+          "owner": "David",
+          "deadline": "Friday",
+          "evidence": {
+            "text": "David will create the remote control design by Friday.",
+            "start": 0.0,
+            "end": 6.0
+          }
+        },
+        {
+          "task": "Create the project presentation.",
+          "owner": "Sarah",
+          "deadline": null,
+          "evidence": {
+            "text": "Sarah will prepare the project presentation.",
+            "start": 12.0,
+            "end": 18.0
+          }
+        }
+      ]
+    },
+    "ground_truth": {
+      "decisions": [
+        {
+          "text": "Adopt a curved ergonomic casing."
+        }
+      ],
+      "action_items": [
+        {
+          "text": "David will create the remote control design."
+        },
+        {
+          "text": "Prepare the project presentation."
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "auth_migration_02",
+    "chunks": [
+      {
+        "text": "We should move authentication to OAuth 2.0. Agreed, let's migrate off legacy session tokens. Alex will draft the migration checklist.",
+        "start": 10.0,
+        "end": 28.0,
+        "token_count": 24,
+        "segments": [
+          {
+            "text": "We should move authentication to OAuth 2.0.",
+            "start": 10.0,
+            "end": 16.0
+          },
+          {
+            "text": "Agreed, let's migrate off legacy session tokens.",
+            "start": 16.0,
+            "end": 22.0
+          },
+          {
+            "text": "Alex will draft the migration checklist.",
+            "start": 22.0,
+            "end": 28.0
+          }
+        ]
+      }
+    ],
+    "minutes": {
+      "title": "Auth Architecture Sync",
+      "summary": "Decided to migrate authentication to OAuth 2.0 and assigned checklist drafting.",
+      "key_points": [
+        "Legacy session tokens will be replaced"
+      ],
+      "decisions": [
+        {
+          "description": "Move authentication to OAuth 2.0.",
+          "evidence": {
+            "text": "We should move authentication to OAuth 2.0.",
+            "start": 10.0,
+            "end": 16.0
+          }
+        }
+      ],
+      "action_items": [
+        {
+          "task": "Write the OAuth migration checklist.",
+          "owner": "Alex",
+          "deadline": null,
+          "evidence": {
+            "text": "Alex will draft the migration checklist.",
+            "start": 22.0,
+            "end": 28.0
+          }
+        },
+        {
+          "task": "Deploy to production immediately.",
+          "owner": null,
+          "deadline": null,
+          "evidence": {
+            "text": "Deploy to production now.",
+            "start": 22.0,
+            "end": 28.0
+          }
+        }
+      ]
+    },
+    "ground_truth": {
+      "decisions": [
+        {
+          "text": "Move authentication to OAuth 2.0."
+        }
+      ],
+      "action_items": [
+        {
+          "text": "Draft the migration checklist."
+        }
+      ]
+    }
+  }
+]
