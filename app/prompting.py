@@ -141,7 +141,18 @@ Transcript section:
 ----------------
 """
 
-def create_synthesis_prompt(chunk_analyses):
+def create_synthesis_prompt(chunk_analyses, visual_context: str = ""):
+
+    visual_section = ""
+    if visual_context.strip():
+        visual_section = f"""
+Visual meeting materials (slides, screenshots, documents):
+----------------
+
+{visual_context}
+
+----------------
+"""
 
     return f"""
 You are MeetMind, an AI meeting intelligence system.
@@ -234,4 +245,4 @@ Chunk analyses:
 {chunk_analyses}
 
 ----------------
-"""
+{visual_section}"""

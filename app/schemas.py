@@ -95,3 +95,27 @@ class RetrievedChunk(BaseModel):
 class GroundedAnswer(BaseModel):
     answer: str
     citations: list[RetrievedChunk] = Field(default_factory=list)
+
+
+class VisualMaterial(BaseModel):
+    source_path: str
+    material_type: str = "slide"
+    timestamp: Optional[float] = None
+    extracted_text: str = ""
+    summary: str = ""
+
+
+class EvidenceValidationSummary(BaseModel):
+    action_items_valid: int
+    action_items_total: int
+    decisions_valid: int
+    decisions_total: int
+    validity_ratio: float
+
+
+class MeetingProcessingResult(BaseModel):
+    minutes: MeetingMinutes
+    segments: list[TranscriptSegment]
+    chunks: list[TranscriptChunk]
+    visual_materials: list[VisualMaterial] = Field(default_factory=list)
+    validation_summary: EvidenceValidationSummary
